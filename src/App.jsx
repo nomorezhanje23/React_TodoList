@@ -1,33 +1,28 @@
-import { useState } from "react"
-import "./styles.css"
+import { useEffect, useState } from "react"
 import { NewTodoForm } from "./NewTodoForm"
+import "./styles.css"
 import { TodoList } from "./TodoList"
 
 export default function App() {
-  const [todos, setTodos] = useState([])
+  const [todos, setTodos] = useState(() => {
+    const localValue = localStorage.getItem("ITEMS")
+    if (localValue == null) return []
+
+    return JSON.parse(localValue)
+  })
+
+  useEffect(() => {
+    localStorage.setItem("ITEMS", JSON.stringify(todos))
+  }, [todos])
 
   function addTodo(title) {
     setTodos(currentTodos => {
       return [
-          ...currentTodos, 
-          { id: crypto.randomUUID(), title, completed: false },
+        ...currentTodos,
+        { id: crypto.randomUUID(), title, completed: false },
       ]
     })
   }
-
-// tHis is when I want to use a hook! 
-
-  //export default function App() {
- // const [todos, setTodos] = useState(() => {
-    //const localValue = localStorage.getItem("ITEMS")
-    //if (localValue == null) return []
-    //return JSON.parse(localValue)
- // })
- // useEffect(() => {
-   // localStorage.setItem("ITEMS", JSON.stringify(todos))
- // }, [todos])
-
-
 
   function toggleTodo(id, completed) {
     setTodos(currentTodos => {
@@ -47,14 +42,11 @@ export default function App() {
     })
   }
 
-  return  (
+  return (
     <>
-    <NewTodoForm onSubmit={addTodo}/>
-    <h1 className="header">Todo List</h1>
-    <TodoList todos={todos} toggleTodo={toggleTodo} deleteTodo={deleteTodo} />
-  
-  </>
-)
+      <NewTodoForm onSubmit={addTodo} />
+      <h1 className="header">Todo List</h1>
+      <TodoList todos={todos} toggleTodo={toggleTodo} deleteTodo={deleteTodo} />
+    </>
+  )
 }
-
-//follow these steps and it will all work out!
